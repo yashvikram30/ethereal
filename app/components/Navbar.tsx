@@ -30,7 +30,7 @@ export function Navbar() {
 
           {/* Center - Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/">
+            <Link href="/browse">
               <Button variant="ghost" className="text-white hover:bg-white/10 text-sm font-medium tracking-wider">
                 BROWSE
               </Button>

@@ -1,107 +1,255 @@
 'use client'
 
-import { useWallet } from '@solana/wallet-adapter-react'
-import { ShoppingCart, Clock, User } from 'lucide-react'
 import { useState } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { 
+  Eye, 
+  Heart, 
+  Share2, 
+  Verified, 
+  Clock, 
+  User,
+  ExternalLink,
+  Image as ImageIcon
+} from 'lucide-react'
 
-interface NFTListing {
-  seller: string
-  mint: string
-  price: number
-  created_at: number
-  listing_bump: number
+interface NFTMetadata {
+  name: string
+  symbol: string
+  description: string
+  image: string
+  attributes?: Array<{
+    trait_type: string
+    value: string
+  }>
+  properties?: {
+    files?: Array<{
+      uri: string
+      type: string
+    }>
+  }
 }
 
 interface NFTCardProps {
-  listing: NFTListing
-  onPurchase: (listing: NFTListing) => void
-  onDelist?: (listing: NFTListing) => void
+  mint: string
+  seller: string
+  price: number
+  metadata?: NFTMetadata
+  isVerified?: boolean
+  isDevnet?: boolean
+  onPurchase?: () => void
+  onView?: () => void
+  onFavorite?: () => void
+  onShare?: () => void
 }
 
-export function NFTCard({ listing, onPurchase, onDelist }: NFTCardProps) {
-  const { publicKey } = useWallet()
+export function NFTCard({
+  mint,
+  seller,
+  price,
+  metadata,
+  isVerified = false,
+  isDevnet = true,
+  onPurchase,
+  onView,
+  onFavorite,
+  onShare
+}: NFTCardProps) {
+  const [imageError, setImageError] = useState(false)
+  const [isFavorited, setIsFavorited] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   const handlePurchase = async () => {
-    if (!publicKey) return
-    setIsLoading(true)
-    try {
-      await onPurchase(listing)
-    } catch (error) {
-      console.error('Purchase failed:', error)
-    } finally {
-      setIsLoading(false)
+    if (onPurchase) {
+      setIsLoading(true)
+      try {
+        await onPurchase()
+      } finally {
+        setIsLoading(false)
+      }
     }
   }
 
-  const handleDelist = async () => {
-    if (!publicKey) return
-    setIsLoading(true)
-    try {
-      await onDelist?.(listing)
-    } catch (error) {
-      console.error('Delist failed:', error)
-    } finally {
-      setIsLoading(false)
+  const handleFavorite = () => {
+    setIsFavorited(!isFavorited)
+    if (onFavorite) onFavorite()
+  }
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: metadata?.name || 'NFT',
+        text: `Check out this NFT: ${metadata?.name}`,
+        url: window.location.href
+      })
+    } else if (onShare) {
+      onShare()
     }
   }
 
-  const isOwner = publicKey?.toString() === listing.seller
-  const priceInSol = listing.price / 1e9 // Convert lamports to SOL
+  const formatPrice = (price: number) => {
+    return (price / 1e9).toFixed(4) + ' SOL'
+  }
+
+  const getShortAddress = (address: string) => {
+    return `${address.slice(0, 4)}...${address.slice(-4)}`
+  }
+
+  const getImageUrl = () => {
+    if (metadata?.image) {
+      return metadata.image
+    }
+    if (metadata?.properties?.files?.[0]?.uri) {
+      return metadata.properties.files[0].uri
+    }
+    return null
+  }
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-      <div className="aspect-square bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-primary-500 rounded-full mx-auto mb-2 flex items-center justify-center">
-            <ShoppingCart className="h-8 w-8 text-white" />
+    <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden bg-black border-gray-800">
+      {/* NFT Image */}
+      <div className="relative aspect-square overflow-hidden">
+        {getImageUrl() && !imageError ? (
+          <img
+            src={getImageUrl()!}
+            alt={metadata?.name || 'NFT'}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-purple-900 to-blue-900 flex items-center justify-center">
+            <ImageIcon className="h-16 w-16 text-gray-400" />
           </div>
-          <p className="text-sm text-gray-600">NFT #{listing.mint.slice(0, 8)}...</p>
+        )}
+        
+        {/* Overlay Actions */}
+        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={onView}
+            className="bg-white/20 hover:bg-white/30 text-white border-0"
+          >
+            <Eye className="h-4 w-4 mr-1" />
+            View
+          </Button>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={handleFavorite}
+            className={`bg-white/20 hover:bg-white/30 text-white border-0 ${
+              isFavorited ? 'text-red-400' : ''
+            }`}
+          >
+            <Heart className={`h-4 w-4 ${isFavorited ? 'fill-current' : ''}`} />
+          </Button>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={handleShare}
+            className="bg-white/20 hover:bg-white/30 text-white border-0"
+          >
+            <Share2 className="h-4 w-4" />
+          </Button>
         </div>
+
+        {/* Verification Badge */}
+        {isVerified && (
+          <div className="absolute top-2 right-2">
+            <Badge className="bg-green-600 hover:bg-green-700">
+              <Verified className="h-3 w-3 mr-1" />
+              Verified
+            </Badge>
+          </div>
+        )}
+
+        {/* Devnet Badge */}
+        {isDevnet && (
+          <div className="absolute top-2 left-2">
+            <Badge variant="outline" className="bg-orange-600/20 text-orange-400 border-orange-400">
+              Devnet
+            </Badge>
+          </div>
+        )}
       </div>
-      
-      <div className="p-4">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center space-x-1">
-            <User className="h-4 w-4 text-gray-500" />
-            <span className="text-sm text-gray-600">
-              {listing.seller.slice(0, 4)}...{listing.seller.slice(-4)}
-            </span>
+
+      {/* NFT Info */}
+      <CardContent className="p-4">
+        <div className="space-y-3">
+          {/* Title & Price */}
+          <div className="flex items-start justify-between">
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold text-white truncate">
+                {metadata?.name || 'Unknown NFT'}
+              </h3>
+              <p className="text-sm text-gray-400 truncate">
+                {metadata?.symbol || 'NFT'}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="font-bold text-white text-lg">
+                {formatPrice(price)}
+              </p>
+            </div>
           </div>
-          <div className="flex items-center space-x-1">
-            <Clock className="h-4 w-4 text-gray-500" />
-            <span className="text-sm text-gray-600">
-              {new Date(listing.created_at * 1000).toLocaleDateString()}
-            </span>
-          </div>
-        </div>
-        
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-lg font-bold text-gray-900">
-            {priceInSol.toFixed(4)} SOL
-          </span>
-        </div>
-        
-        <div className="space-y-2">
-          {isOwner ? (
-            <button
-              onClick={handleDelist}
-              disabled={isLoading}
-              className="w-full bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
-            >
-              {isLoading ? 'Delisting...' : 'Delist NFT'}
-            </button>
-          ) : (
-            <button
+
+          {/* Description */}
+          {metadata?.description && (
+            <p className="text-sm text-gray-300 line-clamp-2">
+              {metadata.description}
+            </p>
+          )}
+
+          {/* Seller Info */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Avatar className="h-6 w-6">
+                <AvatarImage src="" />
+                <AvatarFallback className="text-xs bg-gray-700">
+                  <User className="h-3 w-3" />
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-sm text-gray-400">
+                {getShortAddress(seller)}
+              </span>
+            </div>
+            <Button
+              size="sm"
               onClick={handlePurchase}
-              disabled={isLoading || !publicKey}
-              className="w-full bg-primary-600 hover:bg-primary-700 disabled:bg-primary-400 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+              disabled={isLoading}
+              className="bg-primary-600 hover:bg-primary-700 text-white"
             >
-              {isLoading ? 'Purchasing...' : 'Purchase NFT'}
-            </button>
+              {isLoading ? 'Processing...' : 'Buy Now'}
+            </Button>
+          </div>
+
+          {/* Attributes Preview */}
+          {metadata?.attributes && metadata.attributes.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {metadata.attributes.slice(0, 3).map((attr, index) => (
+                <Badge
+                  key={index}
+                  variant="outline"
+                  className="text-xs bg-gray-800/50 border-gray-600 text-gray-300"
+                >
+                  {attr.trait_type}: {attr.value}
+                </Badge>
+              ))}
+              {metadata.attributes.length > 3 && (
+                <Badge
+                  variant="outline"
+                  className="text-xs bg-gray-800/50 border-gray-600 text-gray-300"
+                >
+                  +{metadata.attributes.length - 3} more
+                </Badge>
+              )}
+            </div>
           )}
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 } 
