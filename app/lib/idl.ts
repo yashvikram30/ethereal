@@ -1,4 +1,4 @@
-// IDL definition for the marketplace program
+// IDL definition for the marketplace program with devnet bypass
 export const IDL = {
   "version": "0.1.0",
   "name": "marketplace",
@@ -38,14 +38,14 @@ export const IDL = {
       "name": "list",
       "accounts": [
         {
-          "name": "listing",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "seller",
           "isMut": true,
           "isSigner": true
+        },
+        {
+          "name": "sellerAta",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "mint",
@@ -53,12 +53,52 @@ export const IDL = {
           "isSigner": false
         },
         {
-          "name": "marketplace",
+          "name": "listing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "listingAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "marketplaceAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "collectionMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "metadata",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "masterEdition",
           "isMut": false,
           "isSigner": false
         },
         {
           "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
           "isMut": false,
           "isSigner": false
         }
@@ -71,20 +111,111 @@ export const IDL = {
       ]
     },
     {
-      "name": "delist",
+      "name": "purchase",
       "accounts": [
+        {
+          "name": "buyer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "buyerAta",
+          "isMut": true,
+          "isSigner": false
+        },
         {
           "name": "listing",
           "isMut": true,
           "isSigner": false
         },
         {
+          "name": "listingAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketplaceAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treasury",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "seller",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "sellerAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "delistNft",
+      "accounts": [
+        {
           "name": "seller",
           "isMut": true,
           "isSigner": true
         },
         {
+          "name": "sellerAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "listing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "listingAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -93,30 +224,6 @@ export const IDL = {
     }
   ],
   "accounts": [
-    {
-      "name": "MarketplaceAccount",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "authority",
-            "type": "publicKey"
-          },
-          {
-            "name": "feeBasisPoints",
-            "type": "u16"
-          },
-          {
-            "name": "marketplaceBump",
-            "type": "u8"
-          },
-          {
-            "name": "treasury",
-            "type": "publicKey"
-          }
-        ]
-      }
-    },
     {
       "name": "ListingAccount",
       "type": {
@@ -144,28 +251,47 @@ export const IDL = {
           }
         ]
       }
+    },
+    {
+      "name": "MarketplaceAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "feeBasisPoints",
+            "type": "u16"
+          },
+          {
+            "name": "marketplaceBump",
+            "type": "u8"
+          },
+          {
+            "name": "treasury",
+            "type": "publicKey"
+          }
+        ]
+      }
     }
   ],
   "errors": [
     {
       "code": 6000,
       "name": "InvalidPrice",
-      "msg": "Price must be greater than 0"
+      "msg": "The price must be greater than 0"
     },
     {
       "code": 6001,
-      "name": "InvalidFeeBasisPoints",
-      "msg": "Fee basis points must be between 0 and 10000"
+      "name": "NoToken",
+      "msg": "You must have at least one token."
     },
     {
       "code": 6002,
-      "name": "ListingNotFound",
-      "msg": "Listing not found"
-    },
-    {
-      "code": 6003,
-      "name": "Unauthorized",
-      "msg": "Unauthorized"
+      "name": "VerificationFailed",
+      "msg": "NFT verification failed. Only verified NFTs are accepted on mainnet."
     }
   ]
 } 

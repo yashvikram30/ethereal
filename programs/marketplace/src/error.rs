@@ -6,4 +6,6 @@ pub enum MarketplaceError {
     InvalidPrice,
     #[msg("You must have at least one token.")]
     NoToken,
+    #[msg("NFT verification failed. Only verified NFTs are accepted on mainnet.")]
+    VerificationFailed,
 }

@@ -20,7 +20,7 @@ export function Navbar() {
           <div className="flex items-center space-x-6">
             <Link href="/" className="flex items-center space-x-3">
               {/* Logo Image */}
-              <div className="w-8 h-8 flex items-center justify-center">
+              {/* <div className="w-8 h-8 flex items-center justify-center">
                 <Image 
                   src="/logo.png" 
                   alt="Ethereal Logo" 
@@ -28,7 +28,7 @@ export function Navbar() {
                   height={32}
                   className="rounded-full"
                 />
-              </div>
+              </div> */}
               <div>
                 <span className="text-lg font-bold tracking-wider">ETHEREAL</span>
                 {/* <span className="text-sm text-gray-400 tracking-wider block">MARKETPLACE</span> */}

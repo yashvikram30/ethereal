@@ -64,25 +64,7 @@ export default function Home() {
             <div className="flex flex-col lg:flex-row items-center justify-between">
               {/* Left Column - Content */}
               <div className="lg:w-2/3 space-y-8">
-                {/* Brand Section */}
-                <div className="space-y-6 animate-fade-in-up">
-                  <div className="flex items-center space-x-4">
-                    {/* Logo Image */}
-                    <div className="w-12 h-12 flex items-center justify-center animate-pulse-slow">
-                      <Image 
-                        src="/logo.png" 
-                        alt="Ethereal Logo" 
-                        width={48} 
-                        height={48}
-                        className="rounded-full"
-                      />
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-bold tracking-wider animate-slide-in-left">ETHEREAL</h2>
-                      <p className="text-sm text-gray-400 tracking-wider animate-slide-in-left-delay">NFT MARKETPLACE</p>
-                    </div>
-                  </div>
-                </div>
+
 
                 {/* Main Headline - Simplified */}
                 <div className="space-y-8">
