@@ -58,7 +58,7 @@ export function ListNFTModal({ isOpen, onClose, onList }: ListNFTModalProps) {
               type="text"
               id="mint"
               value={mint}
-              onChange={(e) => setMint(e.target.value)}
+              onChange={(e) => setMint((e.target as HTMLInputElement).value)}
               placeholder="Enter NFT mint address"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               required
@@ -73,7 +73,7 @@ export function ListNFTModal({ isOpen, onClose, onList }: ListNFTModalProps) {
               type="number"
               id="price"
               value={price}
-              onChange={(e) => setPrice(e.target.value)}
+              onChange={(e) => setPrice((e.target as HTMLInputElement).value)}
               placeholder="0.0"
               step="0.001"
               min="0"

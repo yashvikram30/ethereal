@@ -2,6 +2,7 @@ import { Connection, PublicKey, Transaction } from '@solana/web3.js'
 import { Program, AnchorProvider, web3, BN } from '@coral-xyz/anchor'
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react'
 import { useMemo } from 'react'
+import { IDL } from './idl'
 
 // Import your program ID from Anchor.toml - Updated to devnet deployment
 const PROGRAM_ID = new PublicKey('BJbuENYJE6FWZ63RzTpPXurEda59wi6iQNN68FFnNSWa')
@@ -24,13 +25,12 @@ export interface ListingAccount {
 }
 
 export class MarketplaceClient {
-  private program: Program
-  private connection: Connection
+  private provider: AnchorProvider
 
   constructor(provider: AnchorProvider) {
-    this.connection = provider.connection
-    // Initialize your program here
-    // this.program = new Program(IDL, PROGRAM_ID, provider)
+    this.provider = provider
+    // Initialize your program here - commented out for now
+    // this.program = new Program(IDL as any, PROGRAM_ID, provider as any)
   }
 
   async listNFT(
@@ -142,8 +142,8 @@ export function useMarketplace() {
     if (!wallet) return null
 
     const provider = new AnchorProvider(
-      connection,
-      wallet,
+      connection as any,
+      wallet as any,
       { commitment: 'confirmed' }
     )
 
