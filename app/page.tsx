@@ -117,25 +117,25 @@ export default function Home() {
               {/* Brand/Logo Area */}
               <div className="space-y-6 animate-fade-in-up">
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center animate-pulse-slow">
+                  {/* <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center animate-pulse-slow">
                     <Sparkles className="h-6 w-6 text-black" />
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold tracking-wider animate-slide-in-left">ETHEREAL</h2>
                     <p className="text-sm text-gray-400 tracking-wider animate-slide-in-left-delay">NFT MARKETPLACE</p>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
               {/* Main Headline - Simplified */}
               <div className="space-y-8">
                 <h1 className="text-7xl md:text-9xl font-bold leading-tight tracking-tight">
-                  <span className="text-white animate-fade-in-up-delay">REDEFINING</span>
+                  <span className="text-white animate-fade-in-up-delay">WHERE ART</span>
                   <br />
                   <span className="text-white animate-fade-in-up-delay-2" style={{
                     WebkitTextStroke: '2px white',
                     color: 'transparent'
-                  }}>COMMERCE</span>
+                  }}>MEETS BLOCKCHAIN</span>
                 </h1>
               </div>
 
