@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Sparkles, Store, Menu } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { WalletMultiButtonDynamic } from './WalletProvider'
 import { ClientOnly } from './ClientOnly'
 
@@ -18,12 +19,19 @@ export function Navbar() {
           {/* Left - Brand */}
           <div className="flex items-center space-x-6">
             <Link href="/" className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                <Store className="h-4 w-4 text-black" />
+              {/* Logo Image */}
+              <div className="w-8 h-8 flex items-center justify-center">
+                <Image 
+                  src="/logo.png" 
+                  alt="Ethereal Logo" 
+                  width={32} 
+                  height={32}
+                  className="rounded-full"
+                />
               </div>
               <div>
                 <span className="text-lg font-bold tracking-wider">ETHEREAL</span>
-                <span className="text-sm text-gray-400 tracking-wider block">MARKETPLACE</span>
+                {/* <span className="text-sm text-gray-400 tracking-wider block">MARKETPLACE</span> */}
               </div>
             </Link>
           </div>

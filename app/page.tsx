@@ -27,6 +27,7 @@ import {
 import { Navbar } from './components/Navbar'
 import { ClientOnly } from './components/ClientOnly'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function Home() {
   const { publicKey } = useWallet()
@@ -66,8 +67,15 @@ export default function Home() {
                 {/* Brand Section */}
                 <div className="space-y-6 animate-fade-in-up">
                   <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center animate-pulse-slow">
-                      <Sparkles className="h-6 w-6 text-black" />
+                    {/* Logo Image */}
+                    <div className="w-12 h-12 flex items-center justify-center animate-pulse-slow">
+                      <Image 
+                        src="/logo.png" 
+                        alt="Ethereal Logo" 
+                        width={48} 
+                        height={48}
+                        className="rounded-full"
+                      />
                     </div>
                     <div>
                       <h2 className="text-2xl font-bold tracking-wider animate-slide-in-left">ETHEREAL</h2>
