@@ -90,8 +90,8 @@ export function CreateNFTModal() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white border-0 px-6 py-3 font-bold">
-          <Plus className="mr-2 h-5 w-5" />
+        <Button className="bg-white text-black hover:bg-gray-100 px-6 py-3 font-bold border-0">
+          <Sparkles className="mr-2 h-5 w-5" />
           CREATE YOUR NFT
         </Button>
       </DialogTrigger>

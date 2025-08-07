@@ -2,25 +2,14 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
 import { ArrowRight, Plus, Sparkles, TrendingUp, Users, Zap } from 'lucide-react'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { Navbar } from './components/Navbar'
 import { ClientOnly } from './components/ClientOnly'
-import { CreateNFTModal } from './components/CreateNFTModal'
 import Link from 'next/link'
 
 export default function Home() {
   const { publicKey } = useWallet()
-  const [isListModalOpen, setIsListModalOpen] = useState(false)
-
-  const handleListNFT = async (mint: string, price: number) => {
-    // Implementation for listing NFT
-    console.log('Listing NFT:', mint, 'for price:', price)
-  }
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -64,53 +53,6 @@ export default function Home() {
                       <ArrowRight className="ml-3 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
                     </Button>
                   </Link>
-                  <ClientOnly>
-                    {publicKey && (
-                      <Dialog open={isListModalOpen} onOpenChange={setIsListModalOpen}>
-                        <DialogTrigger asChild>
-                          <Button className="bg-transparent text-white hover:bg-white/10 px-8 py-4 text-lg font-bold border border-white/20 transition-all duration-300 hover:scale-105">
-                            <Plus className="mr-3 h-6 w-6" />
-                            LIST NFT
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="glass-effect-dark border-white/10 bg-black/90">
-                          <DialogHeader>
-                            <DialogTitle className="text-white text-2xl">List Your NFT</DialogTitle>
-                            <DialogDescription className="text-gray-300 text-lg">
-                              Enter the details of the NFT you want to list for sale.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="space-y-6">
-                            <div>
-                              <Label htmlFor="mint" className="text-white text-lg">NFT Mint Address</Label>
-                              <Input
-                                id="mint"
-                                placeholder="Enter NFT mint address"
-                                className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 mt-2"
-                              />
-                            </div>
-                            <div>
-                              <Label htmlFor="price" className="text-white text-lg">Price (SOL)</Label>
-                              <Input
-                                id="price"
-                                type="number"
-                                placeholder="0.0"
-                                className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 mt-2"
-                              />
-                            </div>
-                            <Button className="w-full bg-white text-black hover:bg-gray-100 border-0 py-4 text-lg font-bold">
-                              List NFT
-                            </Button>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                    )}
-                  </ClientOnly>
-                </div>
-
-                {/* Create NFT Button */}
-                <div className="pt-4 animate-fade-in-up-delay-4">
-                  <CreateNFTModal />
                 </div>
               </div>
             </div>
