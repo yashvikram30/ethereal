@@ -3,8 +3,8 @@ import { Program, AnchorProvider, web3, BN } from '@coral-xyz/anchor'
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react'
 import { useMemo } from 'react'
 
-// Import your program ID from Anchor.toml
-const PROGRAM_ID = new PublicKey('ALAywgGpzDGo25uYh53aUvMmyu5PqEgWahTBw3xukUUY')
+// Import your program ID from Anchor.toml - Updated to devnet deployment
+const PROGRAM_ID = new PublicKey('BJbuENYJE6FWZ63RzTpPXurEda59wi6iQNN68FFnNSWa')
 
 // You'll need to generate this from your Anchor build
 // For now, we'll create a basic interface
