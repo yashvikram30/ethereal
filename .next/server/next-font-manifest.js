@@ -1,1 +1,0 @@
-self.__NEXT_FONT_MANIFEST='{"pages":{},"app":{"/Users/yash/Desktop/marketplace/app/layout":["static/media/18e78746bcf36d49-s.p.otf"]},"appUsingSizeAdjust":true,"pagesUsingSizeAdjust":false}';
