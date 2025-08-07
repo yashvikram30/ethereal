@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Solana NFT Marketplace",
   "scripts": {
-    "build": "anchor build",
+    "build": "next build",
     "deploy": "anchor deploy",
     "test": "anchor test",
     "dev": "next dev",
