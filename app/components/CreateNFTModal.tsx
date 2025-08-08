@@ -331,7 +331,7 @@ export function CreateNFTModal() {
             <div className="space-y-3">
               <p className="text-blue-300 text-sm">
                 <strong>Real NFT Minting:</strong> This creates actual NFTs on Solana devnet using the Metaplex Token Metadata program. 
-                You'll need at least 0.01 devnet SOL to cover transaction fees.
+                You&apos;ll need at least 0.01 devnet SOL to cover transaction fees.
               </p>
               {publicKey && (
                 <Button

@@ -240,7 +240,7 @@ export function NFTGallery({
           </p>
           {searchTerm && (
             <Badge variant="outline" className="bg-gray-800/50 border-gray-600 text-gray-300">
-              Search: "{searchTerm}"
+              Search: &quot;{searchTerm}&quot;
             </Badge>
           )}
         </div>

@@ -132,7 +132,7 @@ export default function MyListings() {
                 <Package className="h-24 w-24 mx-auto" />
               </div>
               <h3 className="text-3xl font-bold text-white mb-6 tracking-tight">NO LISTINGS YET</h3>
-              <p className="text-gray-400 text-lg mb-12 max-w-md mx-auto">You haven't listed any NFTs for sale yet.</p>
+              <p className="text-gray-400 text-lg mb-12 max-w-md mx-auto">You haven&apos;t listed any NFTs for sale yet.</p>
               <Link href="/">
                 <Button className="bg-white text-black hover:bg-gray-100 border-0 px-8 py-4 text-lg font-bold">
                   BROWSE MARKETPLACE
