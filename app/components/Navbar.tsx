@@ -8,6 +8,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { WalletMultiButtonDynamic } from './WalletProvider'
 import { ClientOnly } from './ClientOnly'
+import { WalletBalance } from './WalletBalance'
 
 export function Navbar() {
   const { publicKey } = useWallet()
@@ -16,8 +17,8 @@ export function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
-          {/* Left - Brand */}
-          <div className="flex items-center space-x-6">
+          {/* Left - Brand and Navigation */}
+          <div className="flex items-center space-x-8">
             <Link href="/" className="flex items-center space-x-3">
               {/* Logo Image */}
               {/* <div className="w-8 h-8 flex items-center justify-center">
@@ -34,34 +35,28 @@ export function Navbar() {
                 {/* <span className="text-sm text-gray-400 tracking-wider block">MARKETPLACE</span> */}
               </div>
             </Link>
-          </div>
 
-          {/* Center - Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link href="/browse">
-              <Button variant="ghost" className="text-white hover:bg-white/10 text-sm font-medium tracking-wider">
-                BROWSE
-              </Button>
-            </Link>
-            {publicKey && (
+            {/* Navigation Tabs */}
+            <div className="hidden md:flex items-center space-x-6">
+              <Link href="/browse">
+                <Button variant="ghost" className="text-white hover:bg-white/10 text-sm font-medium tracking-wider">
+                  BROWSE
+                </Button>
+              </Link>
               <Link href="/my-listings">
                 <Button variant="ghost" className="text-white hover:bg-white/10 text-sm font-medium tracking-wider">
                   MY LISTINGS
                 </Button>
               </Link>
-            )}
+            </div>
           </div>
 
           {/* Right - Actions */}
           <div className="flex items-center space-x-4">
             <ClientOnly>
               <div className="flex items-center space-x-3">
-                <WalletMultiButtonDynamic className="bg-white text-black hover:bg-gray-100 border-0 font-bold px-4 py-2 text-sm" />
-                {publicKey && (
-                  <Badge variant="secondary" className="bg-green-500/20 text-green-400 border-green-500/30 text-xs">
-                    CONNECTED
-                  </Badge>
-                )}
+                {publicKey && <WalletBalance />}
+                <WalletMultiButtonDynamic className="bg-white text-black hover:bg-gray-100 border-0 font-bold px-6 py-2 text-sm transition-all duration-300 hover:scale-105" />
               </div>
             </ClientOnly>
             

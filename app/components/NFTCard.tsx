@@ -120,8 +120,8 @@ export function NFTCard({
             onError={() => setImageError(true)}
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-purple-900 to-blue-900 flex items-center justify-center">
-            <ImageIcon className="h-16 w-16 text-gray-400" />
+          <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center border border-gray-700">
+            <ImageIcon className="h-16 w-16 text-gray-500" />
           </div>
         )}
         

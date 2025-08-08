@@ -1,7 +1,7 @@
 'use client'
 
 import { useWallet } from '@solana/wallet-adapter-react'
-import { ArrowLeft, Package, Sparkles } from 'lucide-react'
+import { Package, Sparkles } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -12,11 +12,17 @@ import { Navbar } from '../components/Navbar'
 import { ClientOnly } from '../components/ClientOnly'
 
 interface NFTListing {
-  seller: string
+  id: string
   mint: string
   price: number
-  created_at: number
-  listing_bump: number
+  seller: string
+  image: string
+  name: string
+  symbol: string
+  description: string
+  attributes: Array<{ trait_type: string; value: string }>
+  verified: boolean
+  createdAt: number
 }
 
 export default function MyListings() {
@@ -24,7 +30,7 @@ export default function MyListings() {
   const [listings, setListings] = useState<NFTListing[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
-  // Mock data for demonstration
+  // Load user listings from localStorage
   useEffect(() => {
     if (!publicKey) {
       setListings([])
@@ -32,26 +38,45 @@ export default function MyListings() {
       return
     }
 
-    const mockListings: NFTListing[] = [
-      {
-        seller: publicKey.toString(),
-        mint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-        price: 1000000000, // 1 SOL in lamports
-        created_at: Date.now() / 1000,
-        listing_bump: 1,
-      },
-    ]
-    setListings(mockListings)
+    try {
+      const storedListings = localStorage.getItem('userListings')
+      if (storedListings) {
+        const allListings: NFTListing[] = JSON.parse(storedListings)
+        // Filter listings for current user
+        const userListings = allListings.filter(
+          listing => listing.seller === publicKey.toString()
+        )
+        setListings(userListings)
+      } else {
+        setListings([])
+      }
+    } catch (error) {
+      console.error('Error loading listings:', error)
+      setListings([])
+    }
+    
     setIsLoading(false)
   }, [publicKey])
 
   const handleDelist = async (listing: NFTListing) => {
     try {
       console.log('Delisting NFT:', listing)
+      
+      // Remove from local state
       setListings(prev => prev.filter(l => l.mint !== listing.mint))
+      
+      // Remove from localStorage
+      const storedListings = localStorage.getItem('userListings')
+      if (storedListings) {
+        const allListings: NFTListing[] = JSON.parse(storedListings)
+        const updatedListings = allListings.filter(l => l.mint !== listing.mint)
+        localStorage.setItem('userListings', JSON.stringify(updatedListings))
+      }
+      
+      alert('NFT delisted successfully!')
     } catch (error) {
       console.error('Failed to delist NFT:', error)
-      throw error
+      alert('Failed to delist NFT. Please try again.')
     }
   }
 
@@ -59,15 +84,17 @@ export default function MyListings() {
     return (
       <div className="min-h-screen bg-black text-white">
         <Navbar />
-        <main className="pt-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center py-32">
-            <div className="text-gray-400 mb-8">
-              <Package className="h-24 w-24 mx-auto" />
+        <div className="pt-24 pb-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center py-32">
+              <div className="text-gray-400 mb-8">
+                <Package className="h-24 w-24 mx-auto" />
+              </div>
+              <h3 className="text-3xl font-bold text-white mb-6 tracking-tight">CONNECT YOUR WALLET</h3>
+              <p className="text-gray-400 text-lg max-w-md mx-auto">Please connect your wallet to view your listings.</p>
             </div>
-            <h3 className="text-3xl font-bold text-white mb-6 tracking-tight">CONNECT YOUR WALLET</h3>
-            <p className="text-gray-400 text-lg max-w-md mx-auto">Please connect your wallet to view your listings.</p>
           </div>
-        </main>
+        </div>
       </div>
     )
   }
@@ -76,55 +103,71 @@ export default function MyListings() {
     <div className="min-h-screen bg-black text-white">
       <Navbar />
       
-      <main className="pt-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="flex items-center mb-16">
-          <Link href="/">
-            <Button variant="ghost" className="mr-8 text-white hover:bg-white/10">
-              <ArrowLeft className="h-5 w-5 mr-3" />
-              BACK
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-5xl font-bold text-white mb-4 tracking-tight">MY LISTINGS</h1>
-            <p className="text-xl text-gray-300">Manage your NFT listings</p>
+      {/* Header */}
+      <div className="pt-24 pb-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                My Listings
+              </h1>
+              <p className="text-xl text-gray-300">
+                Manage your NFT listings on the Solana blockchain
+              </p>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Listings */}
-        {isLoading ? (
-          <div className="flex justify-center items-center py-32">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white"></div>
-          </div>
-        ) : listings.length === 0 ? (
-          <div className="text-center py-32">
-            <div className="text-gray-400 mb-8">
-              <Package className="h-24 w-24 mx-auto" />
+      {/* NFT Gallery */}
+      <div className="pb-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {isLoading ? (
+            <div className="flex justify-center items-center py-32">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white"></div>
             </div>
-            <h3 className="text-3xl font-bold text-white mb-6 tracking-tight">NO LISTINGS YET</h3>
-            <p className="text-gray-400 text-lg mb-12 max-w-md mx-auto">You haven't listed any NFTs for sale yet.</p>
-            <Link href="/">
-              <Button className="bg-white text-black hover:bg-gray-100 border-0 px-8 py-4 text-lg font-bold">
-                BROWSE MARKETPLACE
-              </Button>
-            </Link>
-          </div>
-        ) : (
-          <ClientOnly>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          ) : listings.length === 0 ? (
+            <div className="text-center py-32">
+              <div className="text-gray-400 mb-8">
+                <Package className="h-24 w-24 mx-auto" />
+              </div>
+              <h3 className="text-3xl font-bold text-white mb-6 tracking-tight">NO LISTINGS YET</h3>
+              <p className="text-gray-400 text-lg mb-12 max-w-md mx-auto">You haven't listed any NFTs for sale yet.</p>
+              <Link href="/">
+                <Button className="bg-white text-black hover:bg-gray-100 border-0 px-8 py-4 text-lg font-bold">
+                  BROWSE MARKETPLACE
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <ClientOnly>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {listings.map((listing, index) => (
                 <Card key={`${listing.seller}-${listing.mint}-${index}`} className="glass-effect-dark border-white/10 bg-black/50 hover:scale-105 transition-transform duration-300">
                   <CardContent className="p-6">
-                    <div className="aspect-square bg-gradient-to-br from-white/10 to-white/5 rounded-lg flex items-center justify-center mb-6">
-                      <div className="text-center">
-                        <div className="w-20 h-20 bg-white rounded-full mx-auto mb-4 flex items-center justify-center">
-                          <Sparkles className="h-10 w-10 text-black" />
+                    <div className="aspect-square bg-gradient-to-br from-white/10 to-white/5 rounded-lg flex items-center justify-center mb-6 overflow-hidden">
+                      {listing.image ? (
+                        <img 
+                          src={listing.image} 
+                          alt={listing.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="text-center">
+                          <div className="w-20 h-20 bg-white rounded-full mx-auto mb-4 flex items-center justify-center">
+                            <Sparkles className="h-10 w-10 text-black" />
+                          </div>
+                          <p className="text-sm text-gray-400">NFT #{listing.mint.slice(0, 8)}...</p>
                         </div>
-                        <p className="text-sm text-gray-400">NFT #{listing.mint.slice(0, 8)}...</p>
-                      </div>
+                      )}
                     </div>
                     
                     <div className="space-y-4">
+                      <div>
+                        <h3 className="font-bold text-white text-lg mb-1">{listing.name}</h3>
+                        <p className="text-sm text-gray-400 mb-3">{listing.description}</p>
+                      </div>
+                      
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                           <Avatar className="h-8 w-8">
@@ -137,7 +180,7 @@ export default function MyListings() {
                           </span>
                         </div>
                         <Badge variant="secondary" className="bg-white/10 text-white border-white/20">
-                          {(listing.price / 1e9).toFixed(4)} SOL
+                          {listing.price.toFixed(4)} SOL
                         </Badge>
                       </div>
                       
@@ -155,7 +198,8 @@ export default function MyListings() {
             </div>
           </ClientOnly>
         )}
-      </main>
+        </div>
+      </div>
     </div>
   )
 } 

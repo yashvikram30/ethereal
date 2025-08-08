@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Plus, Search, Filter, Grid3X3, List, ArrowUpDown } from 'lucide-react'
 import { useWallet } from '@solana/wallet-adapter-react'
+import { useRealMarketplace } from '../lib/use-real-marketplace'
 import { Navbar } from '../components/Navbar'
 import { NFTGallery } from '../components/NFTGallery'
 import { CreateNFTModal } from '../components/CreateNFTModal'
@@ -36,132 +37,135 @@ interface NFTMetadata {
 
 export default function BrowsePage() {
   const { publicKey } = useWallet()
+  const { purchaseNFT, getWalletBalance, isReady } = useRealMarketplace()
   const [listings, setListings] = useState<NFTListing[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isListModalOpen, setIsListModalOpen] = useState(false)
+  const [listFormData, setListFormData] = useState({
+    mint: '',
+    price: ''
+  })
 
-  // Mock data for demonstration
+  // Load existing listings from localStorage
   useEffect(() => {
-    const mockListings: NFTListing[] = [
-      {
-        id: '1',
-        mint: '7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU',
-        price: 0.5,
-        seller: '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM',
-        image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&h=400&fit=crop',
-        name: 'Cosmic Dreamer #1',
-        symbol: 'COSMIC',
-        description: 'A mesmerizing digital artwork featuring cosmic elements and vibrant colors.',
-        attributes: [
-          { trait_type: 'Background', value: 'Cosmic' },
-          { trait_type: 'Rarity', value: 'Legendary' },
-          { trait_type: 'Edition', value: '1/100' }
-        ],
-        verified: true,
-        createdAt: Date.now() - 86400000 // 1 day ago
-      },
-      {
-        id: '2',
-        mint: '8xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsV',
-        price: 1.2,
-        seller: '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM',
-        image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=400&fit=crop',
-        name: 'Neon City #42',
-        symbol: 'NEON',
-        description: 'Cyberpunk-inspired cityscape with neon lights and futuristic architecture.',
-        attributes: [
-          { trait_type: 'Style', value: 'Cyberpunk' },
-          { trait_type: 'Rarity', value: 'Epic' },
-          { trait_type: 'Edition', value: '42/500' }
-        ],
-        verified: true,
-        createdAt: Date.now() - 172800000 // 2 days ago
-      },
-      {
-        id: '3',
-        mint: '9xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsW',
-        price: 0.8,
-        seller: '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM',
-        image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop',
-        name: 'Abstract Harmony #7',
-        symbol: 'ABSTR',
-        description: 'Abstract composition with flowing lines and harmonious color palette.',
-        attributes: [
-          { trait_type: 'Style', value: 'Abstract' },
-          { trait_type: 'Rarity', value: 'Rare' },
-          { trait_type: 'Edition', value: '7/250' }
-        ],
-        verified: false,
-        createdAt: Date.now() - 259200000 // 3 days ago
-      },
-      {
-        id: '4',
-        mint: 'AxKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsX',
-        price: 2.5,
-        seller: '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM',
-        image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=400&fit=crop',
-        name: 'Digital Portrait #15',
-        symbol: 'PORT',
-        description: 'Stunning digital portrait with intricate details and emotional depth.',
-        attributes: [
-          { trait_type: 'Category', value: 'Portrait' },
-          { trait_type: 'Rarity', value: 'Legendary' },
-          { trait_type: 'Edition', value: '15/50' }
-        ],
-        verified: true,
-        createdAt: Date.now() - 345600000 // 4 days ago
-      },
-      {
-        id: '5',
-        mint: 'BxKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsY',
-        price: 0.3,
-        seller: '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM',
-        image: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=400&h=400&fit=crop',
-        name: 'Minimalist Geometry #23',
-        symbol: 'MIN',
-        description: 'Clean geometric shapes with minimalist design principles.',
-        attributes: [
-          { trait_type: 'Style', value: 'Minimalist' },
-          { trait_type: 'Rarity', value: 'Common' },
-          { trait_type: 'Edition', value: '23/1000' }
-        ],
-        verified: false,
-        createdAt: Date.now() - 432000000 // 5 days ago
-      },
-      {
-        id: '6',
-        mint: 'CxKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsZ',
-        price: 1.8,
-        seller: '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM',
-        image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=400&fit=crop',
-        name: 'Futuristic Landscape #8',
-        symbol: 'FUTURE',
-        description: 'Imaginative landscape with futuristic elements and vibrant colors.',
-        attributes: [
-          { trait_type: 'Category', value: 'Landscape' },
-          { trait_type: 'Rarity', value: 'Epic' },
-          { trait_type: 'Edition', value: '8/300' }
-        ],
-        verified: true,
-        createdAt: Date.now() - 518400000 // 6 days ago
+    try {
+      const storedListings = localStorage.getItem('userListings')
+      if (storedListings) {
+        const allListings: NFTListing[] = JSON.parse(storedListings)
+        setListings(allListings)
+      } else {
+        setListings([])
       }
-    ]
-
-    // Simulate loading
-    setTimeout(() => {
-      setListings(mockListings)
-      setIsLoading(false)
-    }, 1000)
+    } catch (error) {
+      console.error('Error loading listings:', error)
+      setListings([])
+    }
+    
+    setIsLoading(false)
   }, [])
 
   const handlePurchase = async (listing: NFTListing) => {
-    console.log('Purchasing NFT:', listing)
-    // Implementation for purchasing NFT
+    if (!publicKey || !isReady) {
+      alert('Please connect your wallet first')
+      return
+    }
+
+    try {
+      // Check wallet balance
+      const balance = await getWalletBalance()
+      if (balance < listing.price) {
+        alert(`Insufficient balance. You have ${balance.toFixed(4)} SOL, need ${listing.price} SOL`)
+        return
+      }
+
+      // Confirm purchase
+      const confirmed = window.confirm(
+        `Are you sure you want to purchase "${listing.name}" for ${listing.price} SOL?`
+      )
+      
+      if (!confirmed) return
+
+      // Execute purchase
+      const result = await purchaseNFT(
+        listing.seller,
+        listing.mint,
+        listing.price
+      )
+
+      if (result.success) {
+        alert(`Purchase successful! Transaction: ${result.signature}`)
+        console.log('Purchase result:', result)
+      } else {
+        alert('Purchase failed. Please try again.')
+      }
+    } catch (error) {
+      console.error('Error purchasing NFT:', error)
+      alert(`Error purchasing NFT: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
   }
 
   const handleViewNFT = (listing: NFTListing) => {
     console.log('Viewing NFT:', listing)
     // Implementation for viewing NFT details
+  }
+
+  const handleListNFT = async () => {
+    if (!publicKey) {
+      alert('Please connect your wallet first')
+      return
+    }
+
+    if (!listFormData.mint || !listFormData.price) {
+      alert('Please fill in all fields')
+      return
+    }
+
+    const price = parseFloat(listFormData.price)
+    if (isNaN(price) || price <= 0) {
+      alert('Please enter a valid price')
+      return
+    }
+
+    try {
+      // Create new listing with proper image
+      const newListing: NFTListing = {
+        id: Date.now().toString(),
+        mint: listFormData.mint,
+        price: price,
+        seller: publicKey.toString(),
+        image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=400&fit=crop',
+        name: `Your Listed NFT #${Date.now()}`,
+        symbol: 'LISTED',
+        description: `NFT listed for ${price} SOL`,
+        attributes: [
+          { trait_type: 'Status', value: 'Listed' },
+          { trait_type: 'Price', value: `${price} SOL` },
+          { trait_type: 'Mint', value: listFormData.mint.slice(0, 8) + '...' }
+        ],
+        verified: false,
+        createdAt: Date.now()
+      }
+
+      // Add to listings
+      setListings(prev => [newListing, ...prev])
+      
+      // Save to localStorage
+      const existingListings = localStorage.getItem('userListings')
+      const allListings = existingListings ? JSON.parse(existingListings) : []
+      allListings.unshift(newListing)
+      localStorage.setItem('userListings', JSON.stringify(allListings))
+      
+      // Close modal and reset form
+      setIsListModalOpen(false)
+      setListFormData({ mint: '', price: '' })
+      
+      alert(`NFT listed successfully for ${price} SOL!`)
+      console.log('NFT listed:', newListing)
+      
+    } catch (error) {
+      console.error('Error listing NFT:', error)
+      alert(`Error listing NFT: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
   }
 
   return (
@@ -204,6 +208,8 @@ export default function BrowsePage() {
                         <Input
                           id="mint"
                           placeholder="Enter NFT mint address"
+                          value={listFormData.mint}
+                          onChange={(e) => setListFormData(prev => ({ ...prev, mint: e.target.value }))}
                           className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 mt-2"
                         />
                       </div>
@@ -213,10 +219,15 @@ export default function BrowsePage() {
                           id="price"
                           type="number"
                           placeholder="0.0"
+                          value={listFormData.price}
+                          onChange={(e) => setListFormData(prev => ({ ...prev, price: e.target.value }))}
                           className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 mt-2"
                         />
                       </div>
-                      <Button className="w-full bg-white text-black hover:bg-gray-100 border-0 py-4 text-lg font-bold">
+                      <Button 
+                        onClick={handleListNFT}
+                        className="w-full bg-white text-black hover:bg-gray-100 border-0 py-4 text-lg font-bold"
+                      >
                         List NFT
                       </Button>
                     </div>

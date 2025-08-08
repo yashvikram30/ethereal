@@ -31,7 +31,7 @@ export default function Home() {
               {/* Left Column - Content */}
               <div className="lg:w-2/3 space-y-8">
                 {/* Main Headline - Simplified */}
-                <h1 className="text-7xl md:text-9xl font-bold leading-tight tracking-tight">
+                <h1 className="text-7xl md:text-9xl font-bold leading-tight tracking-tight mt-12">
                   <span className="text-white animate-fade-in-up-delay">WHERE ART</span>
                   <br />
                   <span className="text-white animate-fade-in-up-delay-2" style={{
@@ -60,30 +60,38 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Stats Section - Minimalist */}
-      <section className="py-32 bg-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Stats Section - Black & White Theme */}
+      <section className="py-32 bg-black relative overflow-hidden">
+        {/* Subtle background pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `radial-gradient(circle at 25% 25%, white 1px, transparent 1px)`,
+            backgroundSize: '30px 30px'
+          }}></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
-            <div className="space-y-4">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto">
-                <TrendingUp className="h-8 w-8 text-white" />
+            <div className="space-y-6 group">
+              <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto shadow-lg group-hover:shadow-white/25 transition-all duration-300 hover:scale-110">
+                <TrendingUp className="h-10 w-10 text-black" />
               </div>
-              <h3 className="text-3xl font-bold text-white">10,000+</h3>
-              <p className="text-gray-400 text-lg">NFTs Traded</p>
+              <h3 className="text-4xl font-bold text-white group-hover:text-gray-300 transition-colors duration-300">10,000+</h3>
+              <p className="text-gray-400 text-lg font-medium">NFTs Traded</p>
             </div>
-            <div className="space-y-4">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto">
-                <Users className="h-8 w-8 text-white" />
+            <div className="space-y-6 group">
+              <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto shadow-lg group-hover:shadow-white/25 transition-all duration-300 hover:scale-110">
+                <Users className="h-10 w-10 text-black" />
               </div>
-              <h3 className="text-3xl font-bold text-white">5,000+</h3>
-              <p className="text-gray-400 text-lg">Active Users</p>
+              <h3 className="text-4xl font-bold text-white group-hover:text-gray-300 transition-colors duration-300">5,000+</h3>
+              <p className="text-gray-400 text-lg font-medium">Active Users</p>
             </div>
-            <div className="space-y-4">
-              <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto">
-                <Zap className="h-8 w-8 text-white" />
+            <div className="space-y-6 group">
+              <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto shadow-lg group-hover:shadow-white/25 transition-all duration-300 hover:scale-110">
+                <Zap className="h-10 w-10 text-black" />
               </div>
-              <h3 className="text-3xl font-bold text-white">50,000+</h3>
-              <p className="text-gray-400 text-lg">SOL Volume</p>
+              <h3 className="text-4xl font-bold text-white group-hover:text-gray-300 transition-colors duration-300">50,000+</h3>
+              <p className="text-gray-400 text-lg font-medium">SOL Volume</p>
             </div>
           </div>
         </div>

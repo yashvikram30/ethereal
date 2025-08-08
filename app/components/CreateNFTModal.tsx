@@ -7,8 +7,11 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Sparkles, Loader2 } from 'lucide-react'
+import { Plus, Sparkles, Loader2, CheckCircle, ExternalLink } from 'lucide-react'
 import { useWallet } from '@solana/wallet-adapter-react'
+import { useBasicNFTMint } from '@/app/lib/use-basic-nft-mint'
+import { PublicKey } from '@solana/web3.js'
+import { getSolanaFaucetUrl } from '@/app/lib/devnet-utils'
 
 interface NFTFormData {
   name: string
@@ -20,8 +23,14 @@ interface NFTFormData {
 
 export function CreateNFTModal() {
   const { publicKey } = useWallet()
+  const { mintNFT, isReady, getWalletBalance } = useBasicNFTMint()
   const [isOpen, setIsOpen] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
+  const [mintResult, setMintResult] = useState<{
+    mint: string
+    signature: string
+    explorerUrl: string
+  } | null>(null)
   const [formData, setFormData] = useState<NFTFormData>({
     name: '',
     symbol: '',
@@ -58,19 +67,45 @@ export function CreateNFTModal() {
   }
 
   const createNFT = async () => {
-    if (!publicKey) {
+    if (!publicKey || !isReady) {
       alert('Please connect your wallet first')
       return
     }
 
     setIsCreating(true)
+    setMintResult(null)
 
     try {
-      // Simulate NFT creation process
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      // Validate form data
+      if (!formData.name || !formData.symbol || !formData.imageUrl) {
+        throw new Error('Please fill in all required fields')
+      }
+
+      // Check wallet balance
+      const balance = await getWalletBalance()
+      if (balance < 0.01) {
+        throw new Error('Insufficient SOL balance. You need at least 0.01 SOL for transaction fees.')
+      }
+
+      // Create metadata for the NFT
+      const metadata = {
+        name: formData.name,
+        symbol: formData.symbol,
+        description: formData.description,
+        imageUrl: formData.imageUrl,
+        attributes: formData.attributes.filter(attr => attr.trait_type && attr.value)
+      }
+
+      // Mint the NFT on Solana devnet
+      const result = await mintNFT(metadata)
       
-      alert(`NFT created successfully! This is a demo - in a real implementation, your NFT would be minted on Solana devnet.`)
-      setIsOpen(false)
+      setMintResult({
+        mint: result.mint,
+        signature: result.signature,
+        explorerUrl: result.explorerUrl
+      })
+
+      // Reset form
       setFormData({
         name: '',
         symbol: '',
@@ -81,7 +116,9 @@ export function CreateNFTModal() {
 
     } catch (error) {
       console.error('Error creating NFT:', error)
-      alert('Error creating NFT. Please try again.')
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      console.log('Full error details:', error)
+      alert(`Error creating NFT: ${errorMessage}`)
     } finally {
       setIsCreating(false)
     }
@@ -259,13 +296,55 @@ export function CreateNFTModal() {
             </Button>
           </div>
 
+          {/* Success Result */}
+          {mintResult && (
+            <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
+              <div className="flex items-center space-x-2 mb-3">
+                <CheckCircle className="h-5 w-5 text-green-400" />
+                <h4 className="text-green-300 font-semibold">NFT Minted Successfully!</h4>
+              </div>
+              <div className="space-y-2 text-sm">
+                <p className="text-green-300">
+                  <strong>Mint Address:</strong> {mintResult.mint}
+                </p>
+                <p className="text-green-300">
+                  <strong>Transaction:</strong> {mintResult.signature}
+                </p>
+                <p className="text-green-300 text-xs">
+                  <strong>Success:</strong> Your NFT has been minted on Solana devnet!
+                </p>
+                <Button
+                  onClick={() => window.open(mintResult.explorerUrl, '_blank')}
+                  variant="outline"
+                  size="sm"
+                  className="border-green-500/20 text-green-300 hover:bg-green-500/10"
+                >
+                  <ExternalLink className="h-4 w-4 mr-1" />
+                  View on Explorer
+                </Button>
+              </div>
+            </div>
+          )}
+
           {/* Info */}
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-            <p className="text-blue-300 text-sm">
-              <strong>Note:</strong> This is a demo implementation. In a real application, 
-              this would create your NFT on Solana devnet using the Metaplex Token Metadata program. 
-              You'll need some devnet SOL to cover transaction fees.
-            </p>
+            <div className="space-y-3">
+              <p className="text-blue-300 text-sm">
+                <strong>Real NFT Minting:</strong> This creates actual NFTs on Solana devnet using the Metaplex Token Metadata program. 
+                You'll need at least 0.01 devnet SOL to cover transaction fees.
+              </p>
+              {publicKey && (
+                <Button
+                  onClick={() => window.open(getSolanaFaucetUrl(publicKey.toString()), '_blank')}
+                  variant="outline"
+                  size="sm"
+                  className="border-blue-500/20 text-blue-300 hover:bg-blue-500/10"
+                >
+                  <ExternalLink className="h-4 w-4 mr-1" />
+                  Get Devnet SOL
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </DialogContent>
